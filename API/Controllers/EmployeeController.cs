@@ -114,6 +114,7 @@ namespace API.Controllers
 
 
                 var tasks = _context.Tasks.Where(x => x.Assignee == employee).ToList();
+                var completed = _context.CompletedTasks.Where(x => x.Assignee == employee).ToList();
                 
                 if(tasks != null && tasks.Count() > 0)
                 {
@@ -122,9 +123,17 @@ namespace API.Controllers
                         task.Assignee= null;
                     }
                 }
+
+                if(completed != null && completed.Count() > 0)
+                {
+                    foreach (var compl in completed!)
+                    {
+                        compl.Assignee= null;
+                    }
+                }
                 _context.Employees.Remove(employee);
                 await _context.SaveChangesAsync();
-                return Ok(tasks);
+                return Ok();
             }
             catch(Exception e)
             {

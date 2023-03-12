@@ -1,7 +1,6 @@
 using API.Data;
 using API.Entities;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 
 namespace API.Controllers
 {
@@ -23,6 +22,7 @@ namespace API.Controllers
                 var employee = _context.Employees.Find(employeeId);
                 if (employee == null) return BadRequest("Employee doen't exist");
 
+                if(task.DueDate == default(DateTime)) return BadRequest("Provide due date for the task");
                 task.Assignee=employee;
                 await _context.Tasks.AddAsync(task);
                 await _context.SaveChangesAsync();
@@ -34,10 +34,15 @@ namespace API.Controllers
             }
         }
         [HttpPost("AddTask")]
-        public async Task<ActionResult> AddTask(WorkTask task)
+        public async Task<ActionResult> AddTask(string title, string description, DateTime dueDate)
         {
             try
             {
+                WorkTask task = new WorkTask{
+                    Title=title == null || title == "" ? throw new Exception() : title,
+                    Description=description == null || title == "" ? throw new Exception() : description,
+                    DueDate=dueDate == default(DateTime) ? throw new Exception() : dueDate
+                };
                 task.Assignee=null;
                 await _context.Tasks.AddAsync(task);
                 await _context.SaveChangesAsync();
