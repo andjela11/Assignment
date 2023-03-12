@@ -51,9 +51,13 @@ namespace API.Controllers
         {
             try
             {
-                return Ok(await _context.CompletedTasks
+                var completedtasks = await _context.CompletedTasks
                                 .Include(x => x.Assignee)
-                                .ToListAsync());
+                                .ToListAsync();
+
+                if(completedtasks.Count() == 0) return Ok("No completed tasks yet");
+
+                return Ok(completedtasks);
             }
             catch (Exception e)
             {
@@ -84,6 +88,9 @@ namespace API.Controllers
                 }
                 empl = empl.OrderByDescending(x => x.Value).ToDictionary(x => x.Key, x => x.Value);
                 var topFive = empl.Take(5);
+
+                if(topFive.Count() == 0) return Ok("No information");
+                
                 return Ok(topFive);
             }
             catch (Exception e)

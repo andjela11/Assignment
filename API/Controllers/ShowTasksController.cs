@@ -18,7 +18,12 @@ namespace API.Controllers
         {
             try
             {
-                return Ok(await _context.Tasks.Include(x => x.Assignee).ToListAsync());
+                var tasks = await _context.Tasks.Include(x => x.Assignee).ToListAsync();
+                if(tasks == null) return BadRequest("No tasks to display");
+
+                if(tasks.Count() == 0) return Ok("No tasks available");
+
+                return Ok(tasks);
             }
             catch(Exception e)
             {
@@ -84,6 +89,8 @@ namespace API.Controllers
                                 .ToListAsync();
 
                 if(task == null) return BadRequest("No tasks");
+
+                if(task.Count() == 0) return Ok("No tasks to display");
 
                 return Ok(task);
             }
